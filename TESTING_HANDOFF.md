@@ -69,7 +69,7 @@ on this host - see `services/support-gateway/package.json` for the toolchain).
 
 ### Start everything
 ```bash
-cd /home/pbdweller/Projects/Chatwoot
+cd /home/user/Projects/Chatwoot
 docker compose up -d              # Chatwoot: Rails + Sidekiq + Postgres + Redis
 docker compose ps                  # confirm all 4 containers are Up
 
