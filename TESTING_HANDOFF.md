@@ -77,7 +77,7 @@ cd services/support-gateway
 npm install                        # first time only
 npm run dev                        # or: npx tsx src/server.ts
 ```
-Chatwoot: `http://localhost:3005` (direct) or `https://chatwoot.hunterclipper.com` (reverse
+Chatwoot: `http://localhost:3005` (direct) or `https://chatwoot.example.com` (reverse
 proxy). Gateway: `http://localhost:4000`.
 
 **Important:** if you edit any file under `services/support-gateway/src/`, you must kill and
