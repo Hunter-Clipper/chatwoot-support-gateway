@@ -1,0 +1,28 @@
+# Secrets - never commit real env files, only the .example templates
+.env
+.env.staging
+.env.*.local
+!*.env.example
+
+# Claude Code local session state - has captured real secrets in permission entries before,
+# never commit this directory
+.claude/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Local data stores (SQLite read model/dedup cache - rebuildable, not source of truth)
+data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS cruft
+.DS_Store

@@ -1,0 +1,72 @@
+# Isolated staging stack for testing a Chatwoot version upgrade before rolling it out to the
+# real dev/test instance (docker-compose.yaml). Separate project name, network, volumes, and
+# host ports - never touches the real instance. Full procedure: UPGRADE_TESTING.md at the repo
+# root. Short version: pin the image below to the version currently in production, bring it up,
+# create real test data, THEN bump the tag to the version you actually want to roll out to,
+# migrate, restart, and rerun the gateway's full contract suite against it
+# (services/support-gateway/.env.staging). Currently left pinned to the last version this was
+# actually verified against.
+#
+# Run with: docker compose -p chatwoot-staging -f docker-compose.staging.yaml --env-file .env.staging up -d
+services:
+  base: &base
+    image: chatwoot/chatwoot:v4.16.0-ce
+    env_file: .env.staging
+    volumes:
+      - staging_storage_data:/app/storage
+
+  rails:
+    <<: *base
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - '0.0.0.0:3006:3000'
+    environment:
+      - NODE_ENV=production
+      - RAILS_ENV=production
+      - INSTALLATION_ENV=docker
+    entrypoint: docker/entrypoints/rails.sh
+    command: ['bundle', 'exec', 'rails', 's', '-p', '3000', '-b', '0.0.0.0']
+    restart: 'no'
+
+  sidekiq:
+    <<: *base
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=production
+      - RAILS_ENV=production
+      - INSTALLATION_ENV=docker
+    command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
+    restart: 'no'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: 'no'
+    ports:
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - staging_postgres_data:/var/lib/postgresql/data
+    env_file: .env.staging
+    environment:
+      - POSTGRES_DB=chatwoot
+      - POSTGRES_USER=postgres
+
+  redis:
+    image: redis:alpine
+    restart: 'no'
+    command: ["sh", "-c", "redis-server --requirepass \"$REDIS_PASSWORD\""]
+    env_file: .env.staging
+    volumes:
+      - staging_redis_data:/data
+    ports:
+      - '127.0.0.1:6380:6379'
+
+volumes:
+  staging_storage_data:
+  staging_postgres_data:
+  staging_redis_data:
