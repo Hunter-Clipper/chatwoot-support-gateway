@@ -77,8 +77,7 @@ cd services/support-gateway
 npm install                        # first time only
 npm run dev                        # or: npx tsx src/server.ts
 ```
-Chatwoot: `http://localhost:3005` (direct) or `https://chatwoot.example.com` (reverse
-proxy). Gateway: `http://localhost:4000`.
+Chatwoot: `http://localhost:3005` Gateway: `http://localhost:4000`
 
 **Important:** if you edit any file under `services/support-gateway/src/`, you must kill and
 restart the gateway process for the change to take effect - `/healthz` responding only proves
